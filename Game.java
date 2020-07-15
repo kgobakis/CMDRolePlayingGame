@@ -13,34 +13,93 @@ public class Game {
         Random rand = new Random();
         Settings settings = new Settings();
         Player player;
-        Enemy Skeleton;
-        Enemy Mage;
-        Enemy Warlock;
-        Enemy Elderman;
+        ArrayList<Enemy> enemies;
 
         if (isGameSaved(settings)) {
             // Player globals
             player = new Player(settings.getMaxPlayerHealth(), settings.getPlayerAttackDamage(),
                     settings.getNumberOfHealthPotions());
             // Creating enemies
-            Skeleton = new Enemy("Skeleton", settings.getMaxEnemyHealth(), settings.getEnemyAttackDamage());
-            Mage = new Enemy("Mage", settings.getMaxEnemyHealth(), settings.getEnemyAttackDamage());
-            Warlock = new Enemy("Warlock", settings.getMaxEnemyHealth(), settings.getEnemyAttackDamage());
-            Elderman = new Enemy("Elderman", settings.getMaxEnemyHealth() + 50, settings.getEnemyAttackDamage());
+            enemies = new ArrayList<Enemy>();
+            enemies.add(new Enemy("Skeleton", settings.getMaxEnemyHealth(), settings.getEnemyAttackDamage()));
+            enemies.add(new Enemy("Mage", settings.getMaxEnemyHealth(), settings.getEnemyAttackDamage()));
+            enemies.add(new Enemy("Warlock", settings.getMaxEnemyHealth(), settings.getEnemyAttackDamage()));
+            enemies.add(new Enemy("Elderman", settings.getMaxEnemyHealth() + 50, settings.getEnemyAttackDamage()));
         } else {
             player = new Player(100, 20, 3);
             player.setName("Babis");
-            Skeleton = new Enemy("Skeleton", 55, 20);
 
-            ArrayList<Enemy> enemies = new ArrayList<Enemy>();
-            enemies.add(Skeleton);
-            System.out.println("Cabron!");
+            enemies = new ArrayList<Enemy>();
+            enemies.add(new Enemy("Skeleton", 55, 20));
+
             settings.saveGame(player, enemies);
         }
-        // boolean running = true;
-        // GAME: while (running) {
 
-        // }
+        boolean running = true;
+        System.out.println("-------------------------------------------");
+
+        System.out.println("\nIn a world where robots run large corporations,"
+                + "\none killer has no choice but to save mankind using just his mind."
+                + "\nDespite the killer's best efforts, \nthe world ends and everybody dies.");
+        System.out.println("-------------------------------------------");
+
+        GAME: while (running) {
+
+            System.out.println("Choose your hero's alias.");
+            String input = in.nextLine();
+            player.setName(input);
+
+            System.out.println("-------------------------------------------");
+
+            // Ask for user to enter their name, also let them know of the properties file
+            // and that they can change it.
+
+            Enemy enemy = enemies.get(rand.nextInt(enemies.size()));
+            System.out.println("\t # " + enemy.getName() + " appeared! #\n");
+
+            while (enemy.getHealth() > 0) {
+                System.out.println("\tYour Current HP is: " + player.getHealth());
+                System.out.println("\t" + enemy.getName() + "'s HP is: " + enemy.getHealth());
+                System.out.println("\n\tMake your next choice.");
+                System.out.println("\t1.Attack");
+                System.out.println("\t2.Drink HP Potion");
+                System.out.println("\t3.Run from Enemy...");
+
+                String i = in.nextLine();
+                if ("1".equals(i)) {
+                    int damageDealt = rand.nextInt(player.getAttackDamage());
+                    int damageTaken = rand.nextInt(enemy.getAttackDamage());
+
+                    enemy.setHealth(enemy.getHealth() - damageDealt);
+                    player.setHealth(player.getHealth() - damageTaken);
+
+                    System.out.println("\t> You strike the " + enemy.getName() + " for " + damageDealt + " damage.");
+                    System.out.println("\t> You receive " + damageTaken + " damage in return.");
+                    if (player.getHealth() < 1) {
+                        System.out.println("\t You have underwent severe damage, the robots have won!");
+                        break;
+                    }
+                } else if ("2".equals(i)) {
+                    if (player.getNumberOfHealthPotions() > 0) {
+                        player.setHealth(player.getHealth() + settings.getHealthPotionHealAmount());
+                        player.setNumberOfHealthPotions(player.getNumberOfHealthPotions() - 1);
+                        System.out.println("\t> You drink a health potion, healing yourself for "
+                                + settings.getHealthPotionHealAmount() + "." + "\n\t> You now have "
+                                + player.getHealth() + " HP." + "\n\t> You have " + player.getNumberOfHealthPotions()
+                                + " health potions left. \n");
+                    } else {
+                        System.out.println(
+                                "\t> You have no health potions left! It is said that Robots carry them to battle!\n");
+                    }
+                } else if ("3".equals(i)) {
+                    System.out.println("\tYou run away from the " + enemy.getName() + "!");
+                    continue GAME;
+                } else {
+
+                }
+
+            }
+        }
     }
 
     private static boolean isGameSaved(Settings settings) {
