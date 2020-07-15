@@ -15,7 +15,7 @@ public class Game {
         Player player;
         ArrayList<Enemy> enemies;
 
-        if (isGameSaved(settings)) {
+        if (!isGameSaved(settings)) {
             // Player globals
             player = new Player(settings.getMaxPlayerHealth(), settings.getPlayerAttackDamage(),
                     settings.getNumberOfHealthPotions());
@@ -36,23 +36,40 @@ public class Game {
         }
 
         boolean running = true;
-        System.out.println("-------------------------------------------");
+        boolean selection = settings.isGameSaved() ? true : false;
 
+        System.out.println("-------------------------------------------");
         System.out.println("\nIn a world where robots run large corporations,"
                 + "\none killer has no choice but to save mankind using just his mind."
                 + "\nDespite the killer's best efforts, \nthe world ends and everybody dies.");
         System.out.println("-------------------------------------------");
 
+        String input;
+
         GAME: while (running) {
 
-            System.out.println("Choose your hero's alias.");
-            String input = in.nextLine();
-            player.setName(input);
+            while (selection) {
+                System.out.println("\t1.Resume Saved Game.");
+                System.out.println("\t2.Start New Game!");
+                input = in.nextLine();
+                if ("1".equals(input)) {
+                    if ("false".equals(settings.getIsGameSaved())) {
+                        settings.changeIsSaved();
+                    }
+                    Game.main(args);
 
-            System.out.println("-------------------------------------------");
+                } else if ("2".equals(input)) {
+                    settings.changeIsSaved();
+                    Game.main(args);
+                }
+            }
+            if (player.getName() == null) {
+                System.out.println("Choose your hero's alias.");
+                input = in.nextLine();
+                player.setName(input);
 
-            // Ask for user to enter their name, also let them know of the properties file
-            // and that they can change it.
+                System.out.println("-------------------------------------------");
+            }
 
             Enemy enemy = enemies.get(rand.nextInt(enemies.size()));
             System.out.println("\t # " + enemy.getName() + " appeared! #\n");
@@ -94,8 +111,11 @@ public class Game {
                 } else if ("3".equals(i)) {
                     System.out.println("\tYou run away from the " + enemy.getName() + "!");
                     continue GAME;
+                } else if ("exit".equals(i)) {
+                    selection = true;
+                    continue GAME;
                 } else {
-
+                    System.out.println("\tInvalid command!");
                 }
 
             }

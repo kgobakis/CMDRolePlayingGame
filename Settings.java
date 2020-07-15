@@ -28,6 +28,26 @@ public class Settings {
     public Settings() {
     }
 
+    public boolean deleteSavedGame() {
+        props = new Properties();
+        File configFile = new File("savedGame.properties");
+        try {
+            props.setProperty("isGameSaved", "player.getName()");
+
+            FileWriter writer = new FileWriter(configFile);
+            writer.close();
+
+            return true;
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+            return false;
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return false;
+        }
+
+    }
+
     public boolean isGameSaved() {
         props = new Properties();
         try {
@@ -35,7 +55,7 @@ public class Settings {
             isGameSaved = props.getProperty("isGameSaved");
 
             if ("false".equals(isGameSaved)) {
-                defaultSettings();
+                // defaultSettings();
                 return false;
             } else {
                 return true;
@@ -50,10 +70,34 @@ public class Settings {
         }
     }
 
+    public boolean changeIsSaved() {
+        props = new Properties();
+        File config = new File("config.properties");
+        try {
+            if ("false".equals(this.isGameSaved)) {
+                props.setProperty("isGameSaved", "false");
+
+            } else {
+                props.setProperty("isGameSaved", "true");
+            }
+            FileWriter writer = new FileWriter(config);
+
+            writer.close();
+            return true;
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+            return false;
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+
     public boolean saveGame(Player player, ArrayList<Enemy> enemies) {
         props = new Properties();
-        File configFile = new File("savedGame.properties");
+        File savedGame = new File("savedGame.properties");
         try {
+
             props.setProperty("playerName", player.getName());
             props.setProperty("playerAttackDamage", "" + player.getAttackDamage());
             props.setProperty("playerHealth", Integer.toString(player.getHealth()));
@@ -64,7 +108,7 @@ public class Settings {
                 props.setProperty("" + enemy.getName() + "AttackDamage", "" + enemy.getAttackDamage());
             }
 
-            FileWriter writer = new FileWriter(configFile);
+            FileWriter writer = new FileWriter(savedGame);
             props.store(writer, "Player saved game.");
             writer.close();
 
@@ -89,7 +133,7 @@ public class Settings {
         this.healthPotionDropChance = 40;
     }
 
-    private void resumeSavedGame() {
+    private void loadSavedGame() {
 
     }
 
