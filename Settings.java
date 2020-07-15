@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,25 +29,25 @@ public class Settings {
     public Settings() {
     }
 
-    public boolean deleteSavedGame() {
-        props = new Properties();
-        File configFile = new File("savedGame.properties");
-        try {
-            props.setProperty("isGameSaved", "player.getName()");
+    // public boolean deleteSavedGame() {
+    // props = new Properties();
+    // File configFile = new File("savedGame.properties");
+    // try {
+    // props.setProperty("isGameSaved", "player.getName()");
 
-            FileWriter writer = new FileWriter(configFile);
-            writer.close();
+    // FileWriter writer = new FileWriter(configFile);
+    // writer.close();
 
-            return true;
-        } catch (FileNotFoundException ex) {
-            ex.printStackTrace();
-            return false;
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return false;
-        }
+    // return true;
+    // } catch (FileNotFoundException ex) {
+    // ex.printStackTrace();
+    // return false;
+    // } catch (IOException ex) {
+    // ex.printStackTrace();
+    // return false;
+    // }
 
-    }
+    // }
 
     public boolean isGameSaved() {
         props = new Properties();
@@ -55,7 +56,6 @@ public class Settings {
             isGameSaved = props.getProperty("isGameSaved");
 
             if ("false".equals(isGameSaved)) {
-                // defaultSettings();
                 return false;
             } else {
                 return true;
@@ -72,17 +72,23 @@ public class Settings {
 
     public boolean changeIsSaved() {
         props = new Properties();
-        File config = new File("config.properties");
+
         try {
+            FileInputStream in = new FileInputStream("config.properties");
+            props.load(in);
+            in.close();
+            FileOutputStream out = new FileOutputStream("config.properties");
             if ("false".equals(this.isGameSaved)) {
-                props.setProperty("isGameSaved", "false");
+                props.setProperty("isGameSaved", "true");
+                this.isGameSaved = "true";
 
             } else {
-                props.setProperty("isGameSaved", "true");
-            }
-            FileWriter writer = new FileWriter(config);
+                props.setProperty("isGameSaved", "false");
+                this.isGameSaved = "false";
 
-            writer.close();
+            }
+            props.store(out, "System Configuration");
+            out.close();
             return true;
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
@@ -123,18 +129,51 @@ public class Settings {
 
     }
 
-    private void defaultSettings() {
-        this.maxEnemyHealth = 100;
-        this.maxPlayerHealth = 100;
-        this.enemyAttackDamage = 25;
-        this.playerAttackDamage = 40;
-        this.healthPotionHealAmount = 20;
-        this.numberOfHealthPotions = 3;
-        this.healthPotionDropChance = 40;
+    public boolean loadDefaultSettings() {
+        props = new Properties();
+        try {
+            props.load(new FileInputStream("config.properties"));
+            isGameSaved = props.getProperty("isGameSaved");
+            this.maxEnemyHealth = Integer.parseInt(props.getProperty("maxEnemyHealth"));
+            this.maxPlayerHealth = Integer.parseInt(props.getProperty("maxPlayerHealth"));
+            this.enemyAttackDamage = Integer.parseInt(props.getProperty("enemyAttackDamage"));
+            this.playerAttackDamage = Integer.parseInt(props.getProperty("playerAttackDamage"));
+            this.healthPotionHealAmount = Integer.parseInt(props.getProperty("healthPotionHealAmount"));
+            this.numberOfHealthPotions = Integer.parseInt(props.getProperty("numberOfHealthPotions"));
+            this.healthPotionDropChance = Integer.parseInt(props.getProperty("healthPotionDropChance"));
+
+            return true;
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+            return false;
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return false;
+        }
+
     }
 
-    private void loadSavedGame() {
+    private boolean loadSavedGame() {
+        props = new Properties();
+        try {
+            props.load(new FileInputStream("savedGame.properties"));
+            isGameSaved = props.getProperty("isGameSaved");
+            this.maxEnemyHealth = Integer.parseInt(props.getProperty("maxEnemyHealth"));
+            this.maxPlayerHealth = Integer.parseInt(props.getProperty("maxPlayerHealth"));
+            this.enemyAttackDamage = Integer.parseInt(props.getProperty("enemyAttackDamage"));
+            this.playerAttackDamage = Integer.parseInt(props.getProperty("playerAttackDamage"));
+            this.healthPotionHealAmount = Integer.parseInt(props.getProperty("healthPotionHealAmount"));
+            this.numberOfHealthPotions = Integer.parseInt(props.getProperty("numberOfHealthPotions"));
+            this.healthPotionDropChance = Integer.parseInt(props.getProperty("healthPotionDropChance"));
 
+            return true;
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+            return false;
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return false;
+        }
     }
 
     public int getMaxPlayerHealth() {

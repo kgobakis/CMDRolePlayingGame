@@ -16,6 +16,7 @@ public class Game {
         ArrayList<Enemy> enemies;
 
         if (!isGameSaved(settings)) {
+            settings.loadDefaultSettings();
             // Player globals
             player = new Player(settings.getMaxPlayerHealth(), settings.getPlayerAttackDamage(),
                     settings.getNumberOfHealthPotions());
@@ -25,10 +26,11 @@ public class Game {
             enemies.add(new Enemy("Mage", settings.getMaxEnemyHealth(), settings.getEnemyAttackDamage()));
             enemies.add(new Enemy("Warlock", settings.getMaxEnemyHealth(), settings.getEnemyAttackDamage()));
             enemies.add(new Enemy("Elderman", settings.getMaxEnemyHealth() + 50, settings.getEnemyAttackDamage()));
+
         } else {
             player = new Player(100, 20, 3);
             player.setName("Babis");
-
+            // settings.loadSavedGame();
             enemies = new ArrayList<Enemy>();
             enemies.add(new Enemy("Skeleton", 55, 20));
 
@@ -49,18 +51,25 @@ public class Game {
         GAME: while (running) {
 
             while (selection) {
-                System.out.println("\t1.Resume Saved Game.");
+                System.out.println("-------------------------------------------");
+
+                System.out.println("\t1.Save Current Game.");
                 System.out.println("\t2.Start New Game!");
+                System.out.println("\t3.Resume Latest Saved Game.");
+                System.out.println("-------------------------------------------");
+
                 input = in.nextLine();
                 if ("1".equals(input)) {
+                    settings.saveGame(player, enemies);
+                    Game.main(args);
+                } else if ("2".equals(input)) {
+                    Game.main(args);
+                } else if ("3".equals(input)) {
                     if ("false".equals(settings.getIsGameSaved())) {
                         settings.changeIsSaved();
                     }
-                    Game.main(args);
-
-                } else if ("2".equals(input)) {
-                    settings.changeIsSaved();
-                    Game.main(args);
+                    // Game.main(args);
+                    System.out.println("11");
                 }
             }
             if (player.getName() == null) {
@@ -81,6 +90,7 @@ public class Game {
                 System.out.println("\t1.Attack");
                 System.out.println("\t2.Drink HP Potion");
                 System.out.println("\t3.Run from Enemy...");
+                System.out.println("\n\t0.To go to the main menu.");
 
                 String i = in.nextLine();
                 if ("1".equals(i)) {
@@ -111,7 +121,7 @@ public class Game {
                 } else if ("3".equals(i)) {
                     System.out.println("\tYou run away from the " + enemy.getName() + "!");
                     continue GAME;
-                } else if ("exit".equals(i)) {
+                } else if ("0".equals(i)) {
                     selection = true;
                     continue GAME;
                 } else {
