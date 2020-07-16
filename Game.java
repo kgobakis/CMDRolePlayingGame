@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+
 import java.util.Random;
 import java.util.Scanner;
 
@@ -25,26 +26,19 @@ public class Game {
             enemies.add(new Enemy("Skeleton", settings.getMaxEnemyHealth(), settings.getEnemyAttackDamage()));
             enemies.add(new Enemy("Mage", settings.getMaxEnemyHealth(), settings.getEnemyAttackDamage()));
             enemies.add(new Enemy("Warlock", settings.getMaxEnemyHealth(), settings.getEnemyAttackDamage()));
-            enemies.add(new Enemy("Elderman", settings.getMaxEnemyHealth() + 50, settings.getEnemyAttackDamage()));
+            enemies.add(new Enemy("Elderman", settings.getMaxEnemyHealth() + 25, settings.getEnemyAttackDamage()));
 
         } else {
-            player = new Player(100, 20, 3);
-            player.setName("Babis");
-            // settings.loadSavedGame();
-            enemies = new ArrayList<Enemy>();
-            enemies.add(new Enemy("Skeleton", 55, 20));
+            PlayerEnemyCombination data = settings.loadSavedGame();
+            player = data.player;
+            enemies = data.enemies;
 
-            settings.saveGame(player, enemies);
         }
+        // enemies = enemies.stream().filter(e -> e.getHealth() >
+        // 0).collect(Collectors.toCollection(ArrayList::new));
 
         boolean running = true;
         boolean selection = settings.isGameSaved() ? true : false;
-
-        System.out.println("-------------------------------------------");
-        System.out.println("\nIn a world where robots run large corporations,"
-                + "\none killer has no choice but to save mankind using just his mind."
-                + "\nDespite the killer's best efforts, \nthe world ends and everybody dies.");
-        System.out.println("-------------------------------------------");
 
         String input;
 
@@ -53,35 +47,42 @@ public class Game {
             while (selection) {
                 System.out.println("-------------------------------------------");
 
-                System.out.println("\t1.Save Current Game.");
+                System.out.println("\t1.Save Current Game & Exit.");
                 System.out.println("\t2.Start New Game!");
-                System.out.println("\t3.Resume Latest Saved Game.");
+                System.out.println("\t3.Load Latest Saved Game.");
                 System.out.println("-------------------------------------------");
 
                 input = in.nextLine();
                 if ("1".equals(input)) {
                     settings.saveGame(player, enemies);
-                    Game.main(args);
+                    System.exit(0);
                 } else if ("2".equals(input)) {
                     Game.main(args);
                 } else if ("3".equals(input)) {
                     if ("false".equals(settings.getIsGameSaved())) {
-                        settings.changeIsSaved();
+                        System.out.println("No Saved Game Exists.");
+                    } else {
+                        selection = false;
+                        break;
                     }
-                    // Game.main(args);
-                    System.out.println("11");
                 }
             }
             if (player.getName() == null) {
+                System.out.println("-------------------------------------------");
+                System.out.println("\nIn a world where robots run large corporations,"
+                        + "\none killer has no choice but to save mankind using just his mind."
+                        + "\nDespite the killer's best efforts, \nthe world ends and everybody dies.");
+                System.out.println("-------------------------------------------");
                 System.out.println("Choose your hero's alias.");
                 input = in.nextLine();
                 player.setName(input);
 
                 System.out.println("-------------------------------------------");
             }
-
             Enemy enemy = enemies.get(rand.nextInt(enemies.size()));
-            System.out.println("\t # " + enemy.getName() + " appeared! #\n");
+
+            if (enemy.getHealth() > 0)
+                System.out.println("\t # " + enemy.getName() + " appeared! #\n");
 
             while (enemy.getHealth() > 0) {
                 System.out.println("\tYour Current HP is: " + player.getHealth());
@@ -104,7 +105,7 @@ public class Game {
                     System.out.println("\t> You receive " + damageTaken + " damage in return.");
                     if (player.getHealth() < 1) {
                         System.out.println("\t You have underwent severe damage, the robots have won!");
-                        break;
+                        System.exit(0);
                     }
                 } else if ("2".equals(i)) {
                     if (player.getNumberOfHealthPotions() > 0) {
@@ -119,7 +120,9 @@ public class Game {
                                 "\t> You have no health potions left! It is said that Robots carry them to battle!\n");
                     }
                 } else if ("3".equals(i)) {
-                    System.out.println("\tYou run away from the " + enemy.getName() + "!");
+                    System.out.println("-------------------------------------------");
+
+                    System.out.println("\tYou run away from the " + enemy.getName() + "!\n");
                     continue GAME;
                 } else if ("0".equals(i)) {
                     selection = true;
@@ -135,4 +138,5 @@ public class Game {
     private static boolean isGameSaved(Settings settings) {
         return settings.isGameSaved();
     }
+
 }

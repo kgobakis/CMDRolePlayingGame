@@ -5,6 +5,9 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Properties;
 
 public class Settings {
@@ -19,7 +22,7 @@ public class Settings {
 
     private int playerAttackDamage;
 
-    private int healthPotionHealAmount;
+    private int healthPotionHealAmount = 25;
 
     private int numberOfHealthPotions;
 
@@ -102,12 +105,18 @@ public class Settings {
     public boolean saveGame(Player player, ArrayList<Enemy> enemies) {
         props = new Properties();
         File savedGame = new File("savedGame.properties");
-        try {
 
+        try {
+            if ("false".equals(getIsGameSaved())) {
+                this.changeIsSaved();
+            }
             props.setProperty("playerName", player.getName());
             props.setProperty("playerAttackDamage", "" + player.getAttackDamage());
             props.setProperty("playerHealth", Integer.toString(player.getHealth()));
             props.setProperty("playerNumberOfHealthPotions", Integer.toString(player.getNumberOfHealthPotions()));
+            props.setProperty("healthPotionHealAmount", Integer.toString(this.healthPotionHealAmount));
+            
+            healthPotionHealAmount=20
 
             for (Enemy enemy : enemies) {
                 props.setProperty("" + enemy.getName() + "Health", "" + enemy.getHealth());
@@ -153,26 +162,32 @@ public class Settings {
 
     }
 
-    private boolean loadSavedGame() {
+    public PlayerEnemyCombination loadSavedGame() {
         props = new Properties();
+        ArrayList<Enemy> enemies = new ArrayList<Enemy>();
         try {
             props.load(new FileInputStream("savedGame.properties"));
-            isGameSaved = props.getProperty("isGameSaved");
-            this.maxEnemyHealth = Integer.parseInt(props.getProperty("maxEnemyHealth"));
-            this.maxPlayerHealth = Integer.parseInt(props.getProperty("maxPlayerHealth"));
-            this.enemyAttackDamage = Integer.parseInt(props.getProperty("enemyAttackDamage"));
-            this.playerAttackDamage = Integer.parseInt(props.getProperty("playerAttackDamage"));
-            this.healthPotionHealAmount = Integer.parseInt(props.getProperty("healthPotionHealAmount"));
-            this.numberOfHealthPotions = Integer.parseInt(props.getProperty("numberOfHealthPotions"));
-            this.healthPotionDropChance = Integer.parseInt(props.getProperty("healthPotionDropChance"));
+            Enemy Mage = new Enemy("Mage", Integer.parseInt(props.getProperty("MageHealth")),
+                    Integer.parseInt(props.getProperty("MageAttackDamage")));
+            Enemy Skeleton = new Enemy("Skeleton", Integer.parseInt(props.getProperty("SkeletonHealth")),
+                    Integer.parseInt(props.getProperty("SkeletonAttackDamage")));
+            Enemy Warlock = new Enemy("Warlock", Integer.parseInt(props.getProperty("WarlockHealth")),
+                    Integer.parseInt(props.getProperty("WarlockAttackDamage")));
+            Enemy Elderman = new Enemy("Elderman", Integer.parseInt(props.getProperty("EldermanHealth")),
+                    Integer.parseInt(props.getProperty("EldermanAttackDamage")));
+            Collections.addAll(enemies, Mage, Skeleton, Warlock, Elderman);
+            Player player = new Player(Integer.parseInt(props.getProperty("playerHealth")),
+                    Integer.parseInt(props.getProperty("playerAttackDamage")),
+                    Integer.parseInt(props.getProperty("playerNumberOfHealthPotions")),
+                    props.getProperty("playerName"));
 
-            return true;
+            return new PlayerEnemyCombination(player, enemies);
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
-            return false;
+            return null;
         } catch (IOException ex) {
             ex.printStackTrace();
-            return false;
+            return null;
         }
     }
 

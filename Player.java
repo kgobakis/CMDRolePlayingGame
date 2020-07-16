@@ -11,6 +11,13 @@ public class Player {
 
     }
 
+    public Player(int health, int attackDamage, int numberOfHealthPotions, String name) {
+        this.health = health;
+        this.attackDamage = attackDamage;
+        this.numberOfHealthPotions = numberOfHealthPotions;
+        this.name = name;
+    }
+
     public int getHealth() {
         return this.health;
     }
