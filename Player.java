@@ -2,6 +2,7 @@ public class Player {
     private int health;
     private int attackDamage;
     private int numberOfHealthPotions;
+    private int enemiesDefeated;
     private String name;
 
     public Player(int health, int attackDamage, int numberOfHealthPotions) {
@@ -16,6 +17,14 @@ public class Player {
         this.attackDamage = attackDamage;
         this.numberOfHealthPotions = numberOfHealthPotions;
         this.name = name;
+    }
+
+    public Player(int health, int attackDamage, int numberOfHealthPotions, String name, int enemiesDefeated) {
+        this.health = health;
+        this.attackDamage = attackDamage;
+        this.numberOfHealthPotions = numberOfHealthPotions;
+        this.name = name;
+        this.enemiesDefeated = enemiesDefeated;
     }
 
     public int getHealth() {
@@ -48,6 +57,14 @@ public class Player {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getEnemiesDefeated() {
+        return this.enemiesDefeated;
+    }
+
+    public void setEnemiesDefeated(int enemiesDefeated) {
+        this.enemiesDefeated = enemiesDefeated;
     }
 
 }

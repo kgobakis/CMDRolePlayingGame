@@ -2,11 +2,28 @@ public class Enemy {
     private String name;
     private int attackDamage;
     private int health;
+    private int healthPotionDropChance;
+
+    public Enemy(String name, int health, int attackDamage, int healthPotionDropChance) {
+        this.attackDamage = attackDamage;
+        this.health = health;
+        this.name = name;
+        this.healthPotionDropChance = healthPotionDropChance;
+    }
 
     public Enemy(String name, int health, int attackDamage) {
         this.attackDamage = attackDamage;
         this.health = health;
         this.name = name;
+
+    }
+
+    public int getHealthPotionDropChance() {
+        return this.healthPotionDropChance;
+    }
+
+    public void setHealthPotionDropChance(int healthPotionDropChance) {
+        this.healthPotionDropChance = healthPotionDropChance;
     }
 
     public String getName() {

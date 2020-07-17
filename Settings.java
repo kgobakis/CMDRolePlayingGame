@@ -6,8 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+
 import java.util.Properties;
 
 public class Settings {
@@ -27,32 +26,15 @@ public class Settings {
     private int numberOfHealthPotions;
 
     private int healthPotionDropChance;
+
     Properties props;
 
     public Settings() {
     }
 
-    // public boolean deleteSavedGame() {
-    // props = new Properties();
-    // File configFile = new File("savedGame.properties");
-    // try {
-    // props.setProperty("isGameSaved", "player.getName()");
-
-    // FileWriter writer = new FileWriter(configFile);
-    // writer.close();
-
-    // return true;
-    // } catch (FileNotFoundException ex) {
-    // ex.printStackTrace();
-    // return false;
-    // } catch (IOException ex) {
-    // ex.printStackTrace();
-    // return false;
-    // }
-
-    // }
-
-    public boolean isGameSaved() {
+    /*
+     * Check if saved game exists.
+     */ public boolean isGameSaved() {
         props = new Properties();
         try {
             props.load(new FileInputStream("config.properties"));
@@ -112,15 +94,16 @@ public class Settings {
             }
             props.setProperty("playerName", player.getName());
             props.setProperty("playerAttackDamage", "" + player.getAttackDamage());
-            props.setProperty("playerHealth", Integer.toString(player.getHealth()));
-            props.setProperty("playerNumberOfHealthPotions", Integer.toString(player.getNumberOfHealthPotions()));
-            props.setProperty("healthPotionHealAmount", Integer.toString(this.healthPotionHealAmount));
-            
-            healthPotionHealAmount=20
+            props.setProperty("playerHealth", "" + player.getHealth());
+            props.setProperty("playerNumberOfHealthPotions", "" + player.getNumberOfHealthPotions());
+            props.setProperty("healthPotionHealAmount", "" + this.getHealthPotionHealAmount());
+            props.setProperty("playerDefeatedEnemies", "" + player.getEnemiesDefeated());
 
             for (Enemy enemy : enemies) {
                 props.setProperty("" + enemy.getName() + "Health", "" + enemy.getHealth());
                 props.setProperty("" + enemy.getName() + "AttackDamage", "" + enemy.getAttackDamage());
+                props.setProperty("" + enemy.getName() + "HealthPotionDropChance",
+                        "" + enemy.getHealthPotionDropChance());
             }
 
             FileWriter writer = new FileWriter(savedGame);
@@ -168,18 +151,22 @@ public class Settings {
         try {
             props.load(new FileInputStream("savedGame.properties"));
             Enemy Mage = new Enemy("Mage", Integer.parseInt(props.getProperty("MageHealth")),
-                    Integer.parseInt(props.getProperty("MageAttackDamage")));
+                    Integer.parseInt(props.getProperty("MageAttackDamage")),
+                    Integer.parseInt(props.getProperty("MageHealthPotionDropChance")));
             Enemy Skeleton = new Enemy("Skeleton", Integer.parseInt(props.getProperty("SkeletonHealth")),
-                    Integer.parseInt(props.getProperty("SkeletonAttackDamage")));
+                    Integer.parseInt(props.getProperty("SkeletonAttackDamage")),
+                    Integer.parseInt(props.getProperty("SkeletonHealthPotionDropChance")));
             Enemy Warlock = new Enemy("Warlock", Integer.parseInt(props.getProperty("WarlockHealth")),
-                    Integer.parseInt(props.getProperty("WarlockAttackDamage")));
+                    Integer.parseInt(props.getProperty("WarlockAttackDamage")),
+                    Integer.parseInt(props.getProperty("WarlockHealthPotionDropChance")));
             Enemy Elderman = new Enemy("Elderman", Integer.parseInt(props.getProperty("EldermanHealth")),
-                    Integer.parseInt(props.getProperty("EldermanAttackDamage")));
+                    Integer.parseInt(props.getProperty("EldermanAttackDamage")),
+                    Integer.parseInt(props.getProperty("EldermanHealthPotionDropChance")));
             Collections.addAll(enemies, Mage, Skeleton, Warlock, Elderman);
             Player player = new Player(Integer.parseInt(props.getProperty("playerHealth")),
                     Integer.parseInt(props.getProperty("playerAttackDamage")),
-                    Integer.parseInt(props.getProperty("playerNumberOfHealthPotions")),
-                    props.getProperty("playerName"));
+                    Integer.parseInt(props.getProperty("playerNumberOfHealthPotions")), props.getProperty("playerName"),
+                    Integer.parseInt(props.getProperty("playerDefeatedEnemies")));
 
             return new PlayerEnemyCombination(player, enemies);
         } catch (FileNotFoundException ex) {
