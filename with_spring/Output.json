@@ -1,0 +1,37 @@
+[
+  {
+    "name": "The Mage",
+    "attackDamage": 47,
+    "health": 100,
+    "healthPotionDropChance": 58,
+    "level": 9
+  },
+  {
+    "name": "The Skeleton",
+    "attackDamage": 41,
+    "health": 100,
+    "healthPotionDropChance": 54,
+    "level": 7
+  },
+  {
+    "name": "The Vampwraith",
+    "attackDamage": 23,
+    "health": 100,
+    "healthPotionDropChance": 42,
+    "level": 1
+  },
+  {
+    "name": "The Ruthless Bane Behemoth",
+    "attackDamage": 44,
+    "health": 100,
+    "healthPotionDropChance": 56,
+    "level": 8
+  },
+  {
+    "name": "The Warlock",
+    "attackDamage": 35,
+    "health": 100,
+    "healthPotionDropChance": 50,
+    "level": 5
+  }
+]

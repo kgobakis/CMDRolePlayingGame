@@ -3,27 +3,55 @@ package com.cmdgame;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.io.FileWriter;
+import java.io.Writer;
 import java.util.ArrayList;
-
+import java.util.HashSet;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 @SpringBootApplication
 public class CmdgameApplication {
+	private Settings settings;
+	private Random rand;
+	private Scanner in;
+
+	private static String[] enemiesList = new String[] { "The Flamehand", "The Vampwraith", "The Soulwing", "Rustbeing",
+			"The Elderman", "The Warlock", "The Quiet Vision", "The Skeleton", "The Ruthless Bane Behemoth",
+			"The Mage" };
 
 	public static void main(String[] args) throws Exception {
 		SpringApplication.run(CmdgameApplication.class, args);
-		run();
+		CmdgameApplication game = new CmdgameApplication();
+		game.run();
 	}
-	public static void run() throws Exception {
 
-		Scanner in = new Scanner(System.in);
-		Random rand = new Random();
-		Settings settings = new Settings();
+	public void run() throws Exception {
+
+		in = new Scanner(System.in);
+		rand = new Random();
+		settings = new Settings();
 		Player player;
 		ArrayList<Enemy> enemies;
 
+		// Testing json
+		if (true) {
+
+			settings.loadDefaultSettings();
+			enemies = this.randomlyGenerateEnemies(5);
+
+			try (Writer writer = new FileWriter("Output.json")) {
+				Gson gson = new GsonBuilder().create();
+				gson.toJson(enemies, writer);
+			}
+			System.out.println("got here");
+			System.exit(0);
+		}
 		if (!settings.isGameSaved()) {
 			settings.loadDefaultSettings();
 			// Creating Player
@@ -200,10 +228,51 @@ public class CmdgameApplication {
 		}
 	}
 
+	private ArrayList<Enemy> randomlyGenerateEnemies(int number) {
+		ArrayList<Enemy> toReturn = new ArrayList<>();
+		Set<Integer> set = new HashSet<>();
+		int elderManHealthBonus = 50;
+
+		if (number > 0 && number < 10) {
+			while (toReturn.size() < number) {
+				int randomIndex = rand.nextInt(10);
+				if (!set.contains(randomIndex)) {
+					if ("Elderman".equals(enemiesList[randomIndex])) {
+						toReturn.add(
+								new Enemy(enemiesList[randomIndex], settings.getMaxEnemyHealth() + elderManHealthBonus,
+										settings.getEnemyAttackDamage() + (3 * randomIndex),
+										settings.getHealthPotionDropChance() + (randomIndex * 2), randomIndex));
+
+						set.add(randomIndex);
+						continue;
+					}
+					toReturn.add(new Enemy(enemiesList[randomIndex], settings.getMaxEnemyHealth(),
+							settings.getEnemyAttackDamage() + (3 * randomIndex),
+							settings.getHealthPotionDropChance() + (randomIndex * 2), randomIndex));
+					set.add(randomIndex);
+				}
+			}
+			return toReturn;
+		} else if (number == 10) {
+			for (int i = 1; i <= enemiesList.length; i++) {
+				if ("Elderman".equals(enemiesList[i])) {
+					toReturn.add(new Enemy(enemiesList[i], settings.getMaxEnemyHealth() + elderManHealthBonus,
+							settings.getEnemyAttackDamage() + (3 * i), settings.getHealthPotionDropChance() + (i * 2),
+							i));
+					continue;
+				}
+				toReturn.add(new Enemy(enemiesList[i], settings.getMaxEnemyHealth(),
+						settings.getEnemyAttackDamage() + (3 * i), settings.getHealthPotionDropChance() + (i * 2), i));
+			}
+			return toReturn;
+		} else {
+			return null;
+		}
+
+	}
+
 	private static void drawWinningMessage(String message, int size) throws Exception {
 		ASCIIArtGenerator.run(message, size);
 	}
-
-	
 
 }

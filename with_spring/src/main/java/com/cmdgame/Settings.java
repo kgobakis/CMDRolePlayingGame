@@ -6,10 +6,14 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 
 import java.util.Properties;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class Settings {
 
@@ -29,6 +33,7 @@ public class Settings {
 
     private int healthPotionDropChance;
 
+    private Writer writer;
     Properties props;
     ClassLoader classLoader;
 
@@ -103,22 +108,33 @@ public class Settings {
             if ("false".equals(getIsGameSaved())) {
                 changeIsSaved();
             }
-            props.setProperty("playerName", player.getName());
-            props.setProperty("playerAttackDamage", "" + player.getAttackDamage());
-            props.setProperty("playerHealth", "" + player.getHealth());
-            props.setProperty("playerNumberOfHealthPotions", "" + player.getNumberOfHealthPotions());
-            props.setProperty("healthPotionHealAmount", "" + this.getHealthPotionHealAmount());
-            props.setProperty("playerDefeatedEnemies", "" + player.getEnemiesDefeated());
+            // Saving enemies and their stats
+            writer = new FileWriter("savedEnemies.json");
+            Gson gson = new GsonBuilder().create();
+            gson.toJson(enemies, writer);
+            // Saving player and their stats
+            writer = new FileWriter("savedPlayer.json");
+            gson.toJson(player, writer);
 
-            for (Enemy enemy : enemies) {
-                props.setProperty("" + enemy.getName() + "Health", "" + enemy.getHealth());
-                props.setProperty("" + enemy.getName() + "AttackDamage", "" + enemy.getAttackDamage());
-                props.setProperty("" + enemy.getName() + "HealthPotionDropChance",
-                        "" + enemy.getHealthPotionDropChance());
-            }
+            // props.setProperty("playerName", player.getName());
+            // props.setProperty("playerAttackDamage", "" + player.getAttackDamage());
+            // props.setProperty("playerHealth", "" + player.getHealth());
+            // props.setProperty("playerNumberOfHealthPotions", "" +
+            // player.getNumberOfHealthPotions());
+            // props.setProperty("healthPotionHealAmount", "" +
+            // this.getHealthPotionHealAmount());
+            // props.setProperty("playerDefeatedEnemies", "" + player.getEnemiesDefeated());
 
-            FileWriter writer = new FileWriter(savedGame);
-            props.store(writer, "Player saved game.");
+            // for (Enemy enemy : enemies) {
+            // props.setProperty("" + enemy.getName() + "Health", "" + enemy.getHealth());
+            // props.setProperty("" + enemy.getName() + "AttackDamage", "" +
+            // enemy.getAttackDamage());
+            // props.setProperty("" + enemy.getName() + "HealthPotionDropChance",
+            // "" + enemy.getHealthPotionDropChance());
+            // }
+
+            // FileWriter writer = new FileWriter(savedGame);
+            // props.store(writer, "Player saved game.");
             writer.close();
 
             return true;
@@ -138,7 +154,7 @@ public class Settings {
 
         try {
             props.load(new FileInputStream(classLoader.getResource("config.properties").getFile()));
-            isGameSaved = props.getProperty("isGameSaved");
+            this.isGameSaved = props.getProperty("isGameSaved");
             this.maxEnemyHealth = Integer.parseInt(props.getProperty("maxEnemyHealth"));
             this.maxPlayerHealth = Integer.parseInt(props.getProperty("maxPlayerHealth"));
             this.enemyAttackDamage = Integer.parseInt(props.getProperty("enemyAttackDamage"));
