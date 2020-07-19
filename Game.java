@@ -26,13 +26,13 @@ public class Game {
             enemies = new ArrayList<Enemy>();
 
             enemies.add(new Enemy("Skeleton", settings.getMaxEnemyHealth(), settings.getEnemyAttackDamage(),
-                    settings.getHealthPotionDropChance()));
+                    settings.getHealthPotionDropChance(), 1));
             enemies.add(new Enemy("Mage", settings.getMaxEnemyHealth(), settings.getEnemyAttackDamage(),
-                    settings.getHealthPotionDropChance()));
+                    settings.getHealthPotionDropChance(), 2));
             enemies.add(new Enemy("Warlock", settings.getMaxEnemyHealth(), settings.getEnemyAttackDamage(),
-                    settings.getHealthPotionDropChance()));
+                    settings.getHealthPotionDropChance(), 3));
             enemies.add(new Enemy("Elderman", settings.getMaxEnemyHealth() + 25, settings.getEnemyAttackDamage(),
-                    settings.getHealthPotionDropChance() + 20));
+                    settings.getHealthPotionDropChance() + 20, 4));
 
         } else {
             // Loading Saved Game

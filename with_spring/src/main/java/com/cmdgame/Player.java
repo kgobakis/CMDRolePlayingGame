@@ -1,3 +1,5 @@
+package com.cmdgame;
+
 public class Player {
     private int health;
     private int attackDamage;
