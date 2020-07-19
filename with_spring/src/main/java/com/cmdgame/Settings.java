@@ -30,6 +30,7 @@ public class Settings {
     private int healthPotionDropChance;
 
     Properties props;
+    ClassLoader classLoader;
 
     public Settings() {
     }
@@ -37,9 +38,11 @@ public class Settings {
     /*
      * Check if saved game exists.
      */ public boolean isGameSaved() {
+        classLoader = getClass().getClassLoader();
         props = new Properties();
         try {
-            props.load(new FileInputStream("config.properties"));
+
+            props.load(new FileInputStream(classLoader.getResource("config.properties").getFile()));
             isGameSaved = props.getProperty("isGameSaved");
 
             if ("false".equals(isGameSaved)) {
@@ -50,21 +53,26 @@ public class Settings {
 
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
+            System.exit(0);
             return false;
         } catch (IOException ex) {
             ex.printStackTrace();
+            System.exit(0);
+
             return false;
         }
     }
 
     public boolean changeIsSaved() {
         props = new Properties();
+        classLoader = getClass().getClassLoader();
 
         try {
-            FileInputStream in = new FileInputStream("config.properties");
+            FileInputStream in = new FileInputStream(classLoader.getResource("config.properties").getFile());
             props.load(in);
             in.close();
-            FileOutputStream out = new FileOutputStream("config.properties");
+
+            FileOutputStream out = new FileOutputStream("src/main/resources/config.properties");
             if ("false".equals(this.isGameSaved)) {
                 props.setProperty("isGameSaved", "true");
                 this.isGameSaved = "true";
@@ -88,11 +96,12 @@ public class Settings {
 
     public boolean saveGame(Player player, ArrayList<Enemy> enemies) {
         props = new Properties();
-        File savedGame = new File("savedGame.properties");
+
+        File savedGame = new File("src/main/resources/savedGame.properties");
 
         try {
             if ("false".equals(getIsGameSaved())) {
-                this.changeIsSaved();
+                changeIsSaved();
             }
             props.setProperty("playerName", player.getName());
             props.setProperty("playerAttackDamage", "" + player.getAttackDamage());
@@ -125,8 +134,10 @@ public class Settings {
 
     public boolean loadDefaultSettings() {
         props = new Properties();
+        classLoader = getClass().getClassLoader();
+
         try {
-            props.load(new FileInputStream("config.properties"));
+            props.load(new FileInputStream(classLoader.getResource("config.properties").getFile()));
             isGameSaved = props.getProperty("isGameSaved");
             this.maxEnemyHealth = Integer.parseInt(props.getProperty("maxEnemyHealth"));
             this.maxPlayerHealth = Integer.parseInt(props.getProperty("maxPlayerHealth"));
@@ -149,9 +160,11 @@ public class Settings {
 
     public PlayerEnemyCombination loadSavedGame() {
         props = new Properties();
+        classLoader = getClass().getClassLoader();
+
         ArrayList<Enemy> enemies = new ArrayList<Enemy>();
         try {
-            props.load(new FileInputStream("savedGame.properties"));
+            props.load(new FileInputStream(classLoader.getResource("savedGame.properties").getFile()));
             Enemy Mage = new Enemy("Mage", Integer.parseInt(props.getProperty("MageHealth")),
                     Integer.parseInt(props.getProperty("MageAttackDamage")),
                     Integer.parseInt(props.getProperty("MageHealthPotionDropChance")), 2);

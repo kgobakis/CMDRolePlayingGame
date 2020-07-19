@@ -12,6 +12,10 @@ import java.util.stream.Collectors;
 @SpringBootApplication
 public class CmdgameApplication {
 
+	public static void main(String[] args) throws Exception {
+		SpringApplication.run(CmdgameApplication.class, args);
+		run();
+	}
 	public static void run() throws Exception {
 
 		Scanner in = new Scanner(System.in);
@@ -200,9 +204,6 @@ public class CmdgameApplication {
 		ASCIIArtGenerator.run(message, size);
 	}
 
-	public static void main(String[] args) throws Exception {
-		SpringApplication.run(CmdgameApplication.class, args);
-		System.out.println("Dsds");
-	}
+	
 
 }
