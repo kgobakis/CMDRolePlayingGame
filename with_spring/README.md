@@ -7,3 +7,5 @@ RUN:
 Personal Comments:
 
 Most of the game is running in a while loop so my testing reflects only basic operations in the overall game.
+The project is not easily extensible given that it was programmed within very constrained while loops. It could
+extend to allow more than one player to play and for more enemies to exists.
