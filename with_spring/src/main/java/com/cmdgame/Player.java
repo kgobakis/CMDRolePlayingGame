@@ -7,6 +7,7 @@ public class Player {
     private int enemiesDefeated;
     private String name;
     private int level;
+    private int experience;
 
     public Player(int health, int attackDamage, int numberOfHealthPotions) {
         this.health = health;
@@ -28,6 +29,14 @@ public class Player {
         this.numberOfHealthPotions = numberOfHealthPotions;
         this.name = name;
         this.enemiesDefeated = enemiesDefeated;
+    }
+
+    public int getExperience() {
+        return this.experience;
+    }
+
+    public void setExperience(int experience) {
+        this.experience = experience;
     }
 
     public int getLevel() {

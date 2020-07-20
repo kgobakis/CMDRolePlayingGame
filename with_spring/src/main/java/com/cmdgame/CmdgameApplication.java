@@ -3,8 +3,6 @@ package com.cmdgame;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.io.FileWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
@@ -21,13 +19,13 @@ public class CmdgameApplication {
 			"The Elderman", "The Warlock", "The Quiet Vision", "The Skeleton", "The Ruthless Bane Behemoth",
 			"The Mage" };
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 		SpringApplication.run(CmdgameApplication.class, args);
 		CmdgameApplication game = new CmdgameApplication();
 		game.run();
 	}
 
-	public void run() throws Exception {
+	public void run() {
 
 		in = new Scanner(System.in);
 		rand = new Random();
@@ -139,10 +137,19 @@ public class CmdgameApplication {
 						System.out.println(" \t# You have " + player.getHealth() + " HP left. # \n");
 						System.out.println("-------------------------------------------");
 
+						player.setExperience(player.getExperience() + 1);
+						if (player.getExperience() == 3) {
+							player.setLevel(player.getLevel() + 1);
+							player.setExperience(0);
+							drawWinningMessage("L e v e l - " + (player.getLevel() + 1) + " !",
+									ASCIIArtGenerator.ART_SIZE_SMALL);
+
+							// Increasing player's AD on level up
+							player.setAttackDamage(player.getAttackDamage() + 2);
+						}
 						if (rand.nextInt(100) <= enemy.getHealthPotionDropChance()) {
 							player.setNumberOfHealthPotions(player.getNumberOfHealthPotions() + 1);
-							drawWinningMessage("P o t i o n", ASCIIArtGenerator.ART_SIZE_SMALL);
-							drawWinningMessage("d r o p p e d !", ASCIIArtGenerator.ART_SIZE_SMALL);
+							drawWinningMessage("P o t i o n + 1", ASCIIArtGenerator.ART_SIZE_SMALL);
 							System.out.println("-------------------------------------------");
 
 							System.out.println(
@@ -196,7 +203,7 @@ public class CmdgameApplication {
 		}
 	}
 
-	private ArrayList<Enemy> randomlyGenerateEnemies(int number) {
+	public ArrayList<Enemy> randomlyGenerateEnemies(int number) {
 		ArrayList<Enemy> toReturn = new ArrayList<>();
 		Set<Integer> set = new HashSet<>();
 		int elderManHealthBonus = 50;
@@ -239,8 +246,11 @@ public class CmdgameApplication {
 
 	}
 
-	private static void drawWinningMessage(String message, int size) throws Exception {
-		ASCIIArtGenerator.run(message, size);
+	private static void drawWinningMessage(String message, int size) {
+		try {
+			ASCIIArtGenerator.run(message, size);
+		} catch (Exception e) {
+		}
 	}
 
 }

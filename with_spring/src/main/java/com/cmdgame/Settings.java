@@ -112,7 +112,7 @@ public class Settings {
 
     }
 
-    public PlayerEnemyCombination loadSavedGame() throws IOException {
+    public PlayerEnemyCombination loadSavedGame() {
         props = new Properties();
         classLoader = getClass().getClassLoader();
         gson = new Gson();
@@ -131,6 +131,9 @@ public class Settings {
 
             return t;
         } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+            return null;
+        } catch (IOException ex) {
             ex.printStackTrace();
             return null;
         }
