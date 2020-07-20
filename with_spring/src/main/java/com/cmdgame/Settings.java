@@ -54,13 +54,17 @@ public class Settings {
 
     }
 
-    public void deleteSavedGame() {
-        File savedPlayer = new File("src/main/java/com/cmdgame/savedPlayer.json");
-        File savedEnemies = new File("src/main/java/com/cmdgame/savedEnemies.json");
+    public boolean deleteSavedGame() {
+        try {
+            File savedPlayer = new File("src/main/java/com/cmdgame/savedPlayer.json");
+            File savedEnemies = new File("src/main/java/com/cmdgame/savedEnemies.json");
 
-        savedPlayer.delete();
-        savedEnemies.delete();
-
+            savedPlayer.delete();
+            savedEnemies.delete();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public boolean saveGame(Player player, ArrayList<Enemy> enemies) {
