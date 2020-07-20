@@ -250,6 +250,7 @@ public class CmdgameApplication {
 		try {
 			ASCIIArtGenerator.run(message, size);
 		} catch (Exception e) {
+			System.out.println(e);
 		}
 	}
 

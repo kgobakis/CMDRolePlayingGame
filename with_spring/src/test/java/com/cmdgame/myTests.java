@@ -9,6 +9,13 @@ import org.junit.jupiter.api.Test;
 public class myTests {
 
     @Test
+    void testLoadDefaultSettings() {
+        Settings settings = new Settings();
+
+        assertEquals(settings.loadDefaultSettings(), true);
+    }
+
+    @Test
     void testDeleteSavedGame() {
         Settings settings = new Settings();
 
