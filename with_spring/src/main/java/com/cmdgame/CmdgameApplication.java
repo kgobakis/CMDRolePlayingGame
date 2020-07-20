@@ -3,8 +3,6 @@ package com.cmdgame;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.io.FileWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
@@ -12,16 +10,12 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 @SpringBootApplication
 public class CmdgameApplication {
 	private Settings settings;
 	private Random rand;
 	private Scanner in;
-
-	private static String[] enemiesList = new String[] { "The Flamehand", "The Vampwraith", "The Soulwing", "Rustbeing",
+	private final String[] enemiesList = new String[] { "The Flamehand", "The Vampwraith", "The Soulwing", "Rustbeing",
 			"The Elderman", "The Warlock", "The Quiet Vision", "The Skeleton", "The Ruthless Bane Behemoth",
 			"The Mage" };
 
@@ -39,35 +33,12 @@ public class CmdgameApplication {
 		Player player;
 		ArrayList<Enemy> enemies;
 
-		// Testing json
-		if (true) {
-
-			settings.loadDefaultSettings();
-			enemies = this.randomlyGenerateEnemies(5);
-
-			try (Writer writer = new FileWriter("Output.json")) {
-				Gson gson = new GsonBuilder().create();
-				gson.toJson(enemies, writer);
-			}
-			System.out.println("got here");
-			System.exit(0);
-		}
 		if (!settings.isGameSaved()) {
 			settings.loadDefaultSettings();
 			// Creating Player
 			player = new Player(settings.getMaxPlayerHealth(), settings.getPlayerAttackDamage(),
 					settings.getNumberOfHealthPotions());
-			// Creating enemies
-			enemies = new ArrayList<Enemy>();
-
-			enemies.add(new Enemy("Skeleton", settings.getMaxEnemyHealth(), settings.getEnemyAttackDamage(),
-					settings.getHealthPotionDropChance(), 1));
-			enemies.add(new Enemy("Mage", settings.getMaxEnemyHealth(), settings.getEnemyAttackDamage(),
-					settings.getHealthPotionDropChance(), 2));
-			enemies.add(new Enemy("Warlock", settings.getMaxEnemyHealth(), settings.getEnemyAttackDamage(),
-					settings.getHealthPotionDropChance(), 3));
-			enemies.add(new Enemy("Elderman", settings.getMaxEnemyHealth() + 25, settings.getEnemyAttackDamage(),
-					settings.getHealthPotionDropChance() + 20, 4));
+			enemies = this.randomlyGenerateEnemies(rand.nextInt(10) + 1);
 
 		} else {
 			// Loading Saved Game
@@ -101,12 +72,10 @@ public class CmdgameApplication {
 					in.close();
 					System.exit(0);
 				} else if ("2".equals(input)) {
-					if ("true".equals(settings.getIsGameSaved())) {
-						settings.changeIsSaved();
-					}
+					settings.deleteSavedGame();
 					run();
 				} else if ("3".equals(input)) {
-					if ("false".equals(settings.getIsGameSaved())) {
+					if (!settings.isGameSaved()) {
 						System.out.println("No Saved Game Exists.");
 					} else {
 						mainMenu = false;
@@ -116,7 +85,6 @@ public class CmdgameApplication {
 								+ player.getName().chars().mapToObj(i -> (char) i + " ").collect(Collectors.joining()),
 								ASCIIArtGenerator.ART_SIZE_SMALL);
 
-						// System.out.println("\t # Welcome back " + player.getName() + "! # \n \n");
 						break;
 					}
 				}
@@ -131,7 +99,8 @@ public class CmdgameApplication {
 				input = in.nextLine();
 				player.setName(input);
 
-				System.out.println("-------------------------------------------");
+				System.out.println("\n\n \t " + enemies.size() + " robots have spawned! Good luck!\n\n");
+
 			}
 			Enemy enemy = enemies.get(rand.nextInt(enemies.size()));
 
@@ -170,11 +139,8 @@ public class CmdgameApplication {
 
 						if (rand.nextInt(100) <= enemy.getHealthPotionDropChance()) {
 							player.setNumberOfHealthPotions(player.getNumberOfHealthPotions() + 1);
-							// System.out.println(" # The " + enemy.getName() + " dropped a health potion! #
-							// ");
 							drawWinningMessage("P o t i o n", ASCIIArtGenerator.ART_SIZE_SMALL);
 							drawWinningMessage("d r o p p e d !", ASCIIArtGenerator.ART_SIZE_SMALL);
-							// drawWinningMessage(" . . . ", ASCIIArtGenerator.ART_SIZE_SMALL);
 							System.out.println("-------------------------------------------");
 
 							System.out.println(
@@ -219,8 +185,8 @@ public class CmdgameApplication {
 				break;
 			}
 
-			if (player.getEnemiesDefeated() == 4) {
-				drawWinningMessage(" (: C o n g r a t s! :)", ASCIIArtGenerator.ART_SIZE_SMALL);
+			if (player.getEnemiesDefeated() == enemies.size()) {
+				drawWinningMessage(" (: _ C o n g r a t s! _ :)", ASCIIArtGenerator.ART_SIZE_SMALL);
 				System.out.println("\n\t\t\t\t\t\t# You did it! You have saved our planet! #\n");
 				in.close();
 				System.exit(0);
@@ -254,7 +220,7 @@ public class CmdgameApplication {
 			}
 			return toReturn;
 		} else if (number == 10) {
-			for (int i = 1; i <= enemiesList.length; i++) {
+			for (int i = 0; i < enemiesList.length; i++) {
 				if ("Elderman".equals(enemiesList[i])) {
 					toReturn.add(new Enemy(enemiesList[i], settings.getMaxEnemyHealth() + elderManHealthBonus,
 							settings.getEnemyAttackDamage() + (3 * i), settings.getHealthPotionDropChance() + (i * 2),

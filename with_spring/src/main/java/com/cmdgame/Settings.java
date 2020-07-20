@@ -3,17 +3,18 @@ package com.cmdgame;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Collections;
-
+import java.util.List;
 import java.util.Properties;
-
+import java.lang.reflect.Type;
+import com.google.gson.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 public class Settings {
 
@@ -33,9 +34,10 @@ public class Settings {
 
     private int healthPotionDropChance;
 
+    private Properties props;
+    private ClassLoader classLoader;
     private Writer writer;
-    Properties props;
-    ClassLoader classLoader;
+    private Gson gson;
 
     public Settings() {
     }
@@ -43,98 +45,40 @@ public class Settings {
     /*
      * Check if saved game exists.
      */ public boolean isGameSaved() {
-        classLoader = getClass().getClassLoader();
-        props = new Properties();
-        try {
 
-            props.load(new FileInputStream(classLoader.getResource("config.properties").getFile()));
-            isGameSaved = props.getProperty("isGameSaved");
+        File file = new File("src/main/java/com/cmdgame/savedPlayer.json");
+        boolean exists = file.exists();
 
-            if ("false".equals(isGameSaved)) {
-                return false;
-            } else {
-                return true;
-            }
-
-        } catch (FileNotFoundException ex) {
-            ex.printStackTrace();
-            System.exit(0);
+        if (!exists) {
             return false;
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            System.exit(0);
-
-            return false;
+        } else {
+            return true;
         }
+
     }
 
-    public boolean changeIsSaved() {
-        props = new Properties();
-        classLoader = getClass().getClassLoader();
+    public void deleteSavedGame() {
+        File savedPlayer = new File("src/main/java/com/cmdgame/savedPlayer.json");
+        File savedEnemies = new File("src/main/java/com/cmdgame/savedEnemies.json");
+        File savedSettings = new File("src/main/java/com/cmdgame/savedSettings.json");
 
-        try {
-            FileInputStream in = new FileInputStream(classLoader.getResource("config.properties").getFile());
-            props.load(in);
-            in.close();
+        savedPlayer.delete();
+        savedEnemies.delete();
 
-            FileOutputStream out = new FileOutputStream("src/main/resources/config.properties");
-            if ("false".equals(this.isGameSaved)) {
-                props.setProperty("isGameSaved", "true");
-                this.isGameSaved = "true";
-
-            } else {
-                props.setProperty("isGameSaved", "false");
-                this.isGameSaved = "false";
-
-            }
-            props.store(out, "System Configuration");
-            out.close();
-            return true;
-        } catch (FileNotFoundException ex) {
-            ex.printStackTrace();
-            return false;
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return false;
-        }
     }
 
     public boolean saveGame(Player player, ArrayList<Enemy> enemies) {
         props = new Properties();
-
-        File savedGame = new File("src/main/resources/savedGame.properties");
-
+        gson = new Gson();
         try {
-            if ("false".equals(getIsGameSaved())) {
-                changeIsSaved();
-            }
+            writer = new FileWriter("src/main/java/com/cmdgame/savedEnemies.json");
             // Saving enemies and their stats
-            writer = new FileWriter("savedEnemies.json");
-            Gson gson = new GsonBuilder().create();
             gson.toJson(enemies, writer);
-            // Saving player and their stats
-            writer = new FileWriter("savedPlayer.json");
+            writer.close();
+
+            // // Saving player and their stats
+            writer = new FileWriter("src/main/java/com/cmdgame/savedPlayer.json");
             gson.toJson(player, writer);
-
-            // props.setProperty("playerName", player.getName());
-            // props.setProperty("playerAttackDamage", "" + player.getAttackDamage());
-            // props.setProperty("playerHealth", "" + player.getHealth());
-            // props.setProperty("playerNumberOfHealthPotions", "" +
-            // player.getNumberOfHealthPotions());
-            // props.setProperty("healthPotionHealAmount", "" +
-            // this.getHealthPotionHealAmount());
-            // props.setProperty("playerDefeatedEnemies", "" + player.getEnemiesDefeated());
-
-            // for (Enemy enemy : enemies) {
-            // props.setProperty("" + enemy.getName() + "Health", "" + enemy.getHealth());
-            // props.setProperty("" + enemy.getName() + "AttackDamage", "" +
-            // enemy.getAttackDamage());
-            // props.setProperty("" + enemy.getName() + "HealthPotionDropChance",
-            // "" + enemy.getHealthPotionDropChance());
-            // }
-
-            // FileWriter writer = new FileWriter(savedGame);
-            // props.store(writer, "Player saved game.");
             writer.close();
 
             return true;
@@ -154,7 +98,6 @@ public class Settings {
 
         try {
             props.load(new FileInputStream(classLoader.getResource("config.properties").getFile()));
-            this.isGameSaved = props.getProperty("isGameSaved");
             this.maxEnemyHealth = Integer.parseInt(props.getProperty("maxEnemyHealth"));
             this.maxPlayerHealth = Integer.parseInt(props.getProperty("maxPlayerHealth"));
             this.enemyAttackDamage = Integer.parseInt(props.getProperty("enemyAttackDamage"));
@@ -176,30 +119,19 @@ public class Settings {
 
     public PlayerEnemyCombination loadSavedGame() {
         props = new Properties();
-        classLoader = getClass().getClassLoader();
-
-        ArrayList<Enemy> enemies = new ArrayList<Enemy>();
+        gson = new Gson();
         try {
-            props.load(new FileInputStream(classLoader.getResource("savedGame.properties").getFile()));
-            Enemy Mage = new Enemy("Mage", Integer.parseInt(props.getProperty("MageHealth")),
-                    Integer.parseInt(props.getProperty("MageAttackDamage")),
-                    Integer.parseInt(props.getProperty("MageHealthPotionDropChance")), 2);
-            Enemy Skeleton = new Enemy("Skeleton", Integer.parseInt(props.getProperty("SkeletonHealth")),
-                    Integer.parseInt(props.getProperty("SkeletonAttackDamage")),
-                    Integer.parseInt(props.getProperty("SkeletonHealthPotionDropChance")), 2);
-            Enemy Warlock = new Enemy("Warlock", Integer.parseInt(props.getProperty("WarlockHealth")),
-                    Integer.parseInt(props.getProperty("WarlockAttackDamage")),
-                    Integer.parseInt(props.getProperty("WarlockHealthPotionDropChance")), 2);
-            Enemy Elderman = new Enemy("Elderman", Integer.parseInt(props.getProperty("EldermanHealth")),
-                    Integer.parseInt(props.getProperty("EldermanAttackDamage")),
-                    Integer.parseInt(props.getProperty("EldermanHealthPotionDropChance")), 2);
-            Collections.addAll(enemies, Mage, Skeleton, Warlock, Elderman);
-            Player player = new Player(Integer.parseInt(props.getProperty("playerHealth")),
-                    Integer.parseInt(props.getProperty("playerAttackDamage")),
-                    Integer.parseInt(props.getProperty("playerNumberOfHealthPotions")), props.getProperty("playerName"),
-                    Integer.parseInt(props.getProperty("playerDefeatedEnemies")));
+            Type type = new TypeToken<ArrayList<Enemy>>() {
+            }.getType();
+            ArrayList<Enemy> enemies = gson.fromJson(new FileReader("src/main/java/com/cmdgame/savedEnemies.json"),
+                    type);
+            enemies.forEach(i -> i.getName());
 
-            return new PlayerEnemyCombination(player, enemies);
+            Player player = gson.fromJson(new FileReader("src/main/java/com/cmdgame/savedPlayer.json"), Player.class);
+
+            PlayerEnemyCombination t = new PlayerEnemyCombination(player, enemies);
+
+            return t;
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
             return null;
