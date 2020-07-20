@@ -3,6 +3,8 @@ package com.cmdgame;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.io.FileWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
@@ -38,7 +40,7 @@ public class CmdgameApplication {
 			// Creating Player
 			player = new Player(settings.getMaxPlayerHealth(), settings.getPlayerAttackDamage(),
 					settings.getNumberOfHealthPotions());
-			enemies = this.randomlyGenerateEnemies(rand.nextInt(10) + 1);
+			enemies = randomlyGenerateEnemies(rand.nextInt(10) + 1);
 
 		} else {
 			// Loading Saved Game

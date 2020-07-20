@@ -8,13 +8,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 import java.lang.reflect.Type;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 
 public class Settings {
 
@@ -28,7 +25,7 @@ public class Settings {
 
     private int playerAttackDamage;
 
-    private int healthPotionHealAmount = 25;
+    private int healthPotionHealAmount;
 
     private int numberOfHealthPotions;
 
@@ -60,7 +57,6 @@ public class Settings {
     public void deleteSavedGame() {
         File savedPlayer = new File("src/main/java/com/cmdgame/savedPlayer.json");
         File savedEnemies = new File("src/main/java/com/cmdgame/savedEnemies.json");
-        File savedSettings = new File("src/main/java/com/cmdgame/savedSettings.json");
 
         savedPlayer.delete();
         savedEnemies.delete();
@@ -68,7 +64,6 @@ public class Settings {
     }
 
     public boolean saveGame(Player player, ArrayList<Enemy> enemies) {
-        props = new Properties();
         gson = new Gson();
         try {
             writer = new FileWriter("src/main/java/com/cmdgame/savedEnemies.json");
@@ -117,15 +112,18 @@ public class Settings {
 
     }
 
-    public PlayerEnemyCombination loadSavedGame() {
+    public PlayerEnemyCombination loadSavedGame() throws IOException {
         props = new Properties();
+        classLoader = getClass().getClassLoader();
         gson = new Gson();
         try {
+            props.load(new FileInputStream(classLoader.getResource("config.properties").getFile()));
+            this.healthPotionHealAmount = Integer.parseInt(props.getProperty("healthPotionHealAmount"));
+
             Type type = new TypeToken<ArrayList<Enemy>>() {
             }.getType();
             ArrayList<Enemy> enemies = gson.fromJson(new FileReader("src/main/java/com/cmdgame/savedEnemies.json"),
                     type);
-            enemies.forEach(i -> i.getName());
 
             Player player = gson.fromJson(new FileReader("src/main/java/com/cmdgame/savedPlayer.json"), Player.class);
 
@@ -133,9 +131,6 @@ public class Settings {
 
             return t;
         } catch (FileNotFoundException ex) {
-            ex.printStackTrace();
-            return null;
-        } catch (IOException ex) {
             ex.printStackTrace();
             return null;
         }
